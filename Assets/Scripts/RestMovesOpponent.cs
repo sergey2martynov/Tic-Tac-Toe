@@ -1,156 +1,124 @@
+using System.Collections.Generic;
 using UnityEngine;
 
-public class RestMovesOpponent : MonoBehaviour
+public class RestMovesOpponent
 {
-    [SerializeField] private GameCalculator _gameCalculator;
+    private const int VerificationNumber = 10;
 
-    [SerializeField] private MoveOpponent _moveOpponent;
-
-    [SerializeField] private CountManager _countManager;
-
-    public void GoRestMoves()
+    public void GoRestMoves(GameCalculator gameCalculator, List<GameObject> zeroes, MoveCounter moveCounter)
     {
-        if (_gameCalculator._gameStates != GameStates.Game)
+        if (gameCalculator.GameStates != GameState.Game)
         {
             return;
         }
 
-        int numberField;
-
-        if (CheckCornerField(new[] {0, 1, 8, 5, 6, 4, 2}, FieldValue.Zero))
+        if (!CheckFieldsWithValues(FieldValue.Zero, gameCalculator, zeroes, moveCounter))
         {
-            numberField = 2;
-
-            GoToField(numberField);
-        }
-        else if (CheckCornerField(new[] {6, 3, 1, 2, 4, 8, 0}, FieldValue.Zero))
-        {
-            numberField = 0;
-
-            GoToField(numberField);
-        }
-        else if (CheckCornerField(new[] {3, 0, 7, 8, 4, 2, 6}, FieldValue.Zero))
-        {
-            numberField = 6;
-
-            GoToField(numberField);
-        }
-        else if (CheckCornerField(new[] {6, 7, 5, 2, 4, 0, 8}, FieldValue.Zero))
-        {
-            numberField = 8;
-
-            GoToField(numberField);
-        }
-        else if (CheckIntermediateField(new[] {4, 7, 0, 2, 1}, FieldValue.Zero))
-        {
-            numberField = 1;
-
-            GoToField(numberField);
-        }
-        else if (CheckIntermediateField(new[] {3, 4, 8, 2, 5}, FieldValue.Zero))
-        {
-            numberField = 5;
-
-            GoToField(numberField);
-        }
-        else if (CheckIntermediateField(new[] {4, 5, 6, 0, 3}, FieldValue.Zero))
-        {
-            numberField = 3;
-
-            GoToField(numberField);
-        }
-        else if (CheckIntermediateField(new[] {1, 4, 6, 8, 7}, FieldValue.Zero))
-        {
-            numberField = 7;
-
-            GoToField(numberField);
-        }
-
-        else if (CheckCornerField(new[] {0, 1, 8, 5, 6, 4, 2}, FieldValue.Cross))
-        {
-            numberField = 2;
-
-            GoToField(numberField);
-        }
-        else if (CheckCornerField(new[] {6, 3, 1, 2, 4, 8, 0}, FieldValue.Cross))
-        {
-            numberField = 0;
-
-            GoToField(numberField);
-        }
-        else if (CheckCornerField(new[] {3, 0, 7, 8, 4, 2, 6}, FieldValue.Cross))
-        {
-            numberField = 6;
-
-            GoToField(numberField);
-        }
-        else if (CheckCornerField(new[] {6, 7, 5, 2, 4, 0, 8}, FieldValue.Cross))
-        {
-            numberField = 8;
-
-            GoToField(numberField);
-        }
-        else if (CheckIntermediateField(new[] {4, 7, 0, 2, 1}, FieldValue.Cross))
-        {
-            numberField = 1;
-
-            GoToField(numberField);
-        }
-        else if (CheckIntermediateField(new[] {3, 4, 8, 2, 5}, FieldValue.Cross))
-        {
-            numberField = 5;
-
-            GoToField(numberField);
-        }
-        else if (CheckIntermediateField(new[] {4, 5, 6, 0, 3}, FieldValue.Cross))
-        {
-            numberField = 3;
-
-            GoToField(numberField);
-        }
-        else if (CheckIntermediateField(new[] {1, 4, 6, 8, 7}, FieldValue.Cross))
-        {
-            numberField = 7;
-
-            GoToField(numberField);
-        }
-        else
-        {
-            for (int numbersField = 0; numbersField < 9; numbersField++)
+            if (!CheckFieldsWithValues(FieldValue.Cross, gameCalculator, zeroes, moveCounter))
             {
-                if (_gameCalculator._fieldValues[numbersField] != FieldValue.Empty) continue;
-                GoToField(numbersField);
-                return;
+                for (int numbersField = 0; numbersField < 9; numbersField++)
+                {
+                    if (gameCalculator._fieldValues[numbersField] != FieldValue.Empty)
+                    {
+                        continue;
+                    }
+
+                    GoToField(numbersField, gameCalculator, zeroes, moveCounter);
+                    return;
+                }
             }
         }
     }
 
-    private void GoToField(int numberField)
+    private void GoToField(int numberField, GameCalculator gameCalculator, List<GameObject> zeroes,
+        MoveCounter moveCounter)
     {
-        _gameCalculator._fieldValues[numberField] = FieldValue.Zero;
+        gameCalculator._fieldValues[numberField] = FieldValue.Zero;
 
-        _moveOpponent._zero[numberField].SetActive(true);
+        zeroes[numberField].SetActive(true);
 
-        _countManager.AddOneCounter();
+        moveCounter.IncreaseCount();
     }
 
-    private bool CheckIntermediateField(int[] numbers, FieldValue fieldValue)
+    private bool CheckIntermediateField(int[] numbers, FieldValue fieldValue, GameCalculator gameCalculator)
     {
-        return (_gameCalculator._fieldValues[numbers[0]] == fieldValue &&
-                _gameCalculator._fieldValues[numbers[1]] == fieldValue ||
-                _gameCalculator._fieldValues[numbers[2]] == fieldValue &&
-                _gameCalculator._fieldValues[numbers[3]] == fieldValue) &&
-               _gameCalculator._fieldValues[numbers[4]] == FieldValue.Empty;
+        return (gameCalculator._fieldValues[numbers[0]] == fieldValue &&
+                gameCalculator._fieldValues[numbers[1]] == fieldValue ||
+                gameCalculator._fieldValues[numbers[2]] == fieldValue &&
+                gameCalculator._fieldValues[numbers[3]] == fieldValue) &&
+               gameCalculator._fieldValues[numbers[4]] == FieldValue.Empty;
     }
 
-    private bool CheckCornerField(int[] numbers, FieldValue fieldValue)
+    private bool CheckCornerField(int[] numbers, FieldValue fieldValue, GameCalculator gameCalculator)
     {
-        return (_gameCalculator._fieldValues[numbers[0]] == fieldValue &&
-                _gameCalculator._fieldValues[numbers[1]] == fieldValue ||
-                _gameCalculator._fieldValues[numbers[2]] == fieldValue &&
-                _gameCalculator._fieldValues[numbers[3]] == fieldValue ||
-                _gameCalculator._fieldValues[numbers[4]] == fieldValue &&
-                _gameCalculator._fieldValues[numbers[5]] == fieldValue) &&
-               _gameCalculator._fieldValues[numbers[6]] == FieldValue.Empty;
+        return (gameCalculator._fieldValues[numbers[0]] == fieldValue &&
+                gameCalculator._fieldValues[numbers[1]] == fieldValue ||
+                gameCalculator._fieldValues[numbers[2]] == fieldValue &&
+                gameCalculator._fieldValues[numbers[3]] == fieldValue ||
+                gameCalculator._fieldValues[numbers[4]] == fieldValue &&
+                gameCalculator._fieldValues[numbers[5]] == fieldValue) &&
+               gameCalculator._fieldValues[numbers[6]] == FieldValue.Empty;
+    }
+
+
+    private bool CheckFieldsWithValues(FieldValue fieldValue, GameCalculator gameCalculator, List<GameObject> zeroes,
+        MoveCounter moveCounter)
+    {
+        int numberField = VerificationNumber;
+        if (CheckCornerField(new[] {0, 1, 8, 5, 6, 4, 2}, fieldValue, gameCalculator))
+        {
+            numberField = 2;
+
+            GoToField(numberField, gameCalculator, zeroes, moveCounter);
+        }
+        else if (CheckCornerField(new[] {6, 3, 1, 2, 4, 8, 0}, fieldValue, gameCalculator))
+        {
+            numberField = 0;
+
+            GoToField(numberField, gameCalculator, zeroes, moveCounter);
+        }
+        else if (CheckCornerField(new[] {3, 0, 7, 8, 4, 2, 6}, fieldValue, gameCalculator))
+        {
+            numberField = 6;
+
+            GoToField(numberField, gameCalculator, zeroes, moveCounter);
+        }
+        else if (CheckCornerField(new[] {6, 7, 5, 2, 4, 0, 8}, fieldValue, gameCalculator))
+        {
+            numberField = 8;
+
+            GoToField(numberField, gameCalculator, zeroes, moveCounter);
+        }
+        else if (CheckIntermediateField(new[] {4, 7, 0, 2, 1}, fieldValue, gameCalculator))
+        {
+            numberField = 1;
+
+            GoToField(numberField, gameCalculator, zeroes, moveCounter);
+        }
+        else if (CheckIntermediateField(new[] {3, 4, 8, 2, 5}, fieldValue, gameCalculator))
+        {
+            numberField = 5;
+
+            GoToField(numberField, gameCalculator, zeroes, moveCounter);
+        }
+        else if (CheckIntermediateField(new[] {4, 5, 6, 0, 3}, fieldValue, gameCalculator))
+        {
+            numberField = 3;
+
+            GoToField(numberField, gameCalculator, zeroes, moveCounter);
+        }
+        else if (CheckIntermediateField(new[] {1, 4, 6, 8, 7}, fieldValue, gameCalculator))
+        {
+            numberField = 7;
+
+            GoToField(numberField, gameCalculator, zeroes, moveCounter);
+        }
+
+        if (numberField != VerificationNumber)
+        {
+            return true;
+        }
+
+        return false;
     }
 }

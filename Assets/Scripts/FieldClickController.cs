@@ -1,8 +1,8 @@
 using System;
 using UnityEngine;
-public class FieldsClickController : MonoBehaviour
+
+public class FieldClickController : MonoBehaviour
 {
-    
     [SerializeField] private GameObject _cross;
 
     [SerializeField] public int _numberField;
@@ -16,7 +16,7 @@ public class FieldsClickController : MonoBehaviour
         if (_gameCalculator._fieldValues[_numberField] == FieldValue.Empty)
         {
             FieldClicked?.Invoke(_numberField);
-        
+
             _cross.SetActive(true);
         }
     }

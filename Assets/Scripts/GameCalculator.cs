@@ -4,23 +4,27 @@ using UnityEngine;
 
 public class GameCalculator : MonoBehaviour
 {
-    [SerializeField] private List<FieldsClickController> _field;
+    [SerializeField] private List<FieldClickController> _fields;
 
     [SerializeField] public List<FieldValue> _fieldValues;
-    
-    [SerializeField] private CrossesVictoryDetector _crossesVictoryDetector;
-    
-    [SerializeField] private CountManager _countManager;
 
-   public GameStates _gameStates;
+    [SerializeField] private MoveCounter _moveCounter;
 
-    public event Action MovePlayer;
+    [SerializeField] private TextOutput _textOutput;
+
+    private VictoryDetector _victoryDetector;
+
+    public GameState GameStates { get; set; }
+
+    public event Action PlayerMoved;
 
     private void Awake()
     {
-        _gameStates = GameStates.Game;
-        
-        foreach (var field in _field)
+        GameStates = GameState.Game;
+
+        _victoryDetector = new VictoryDetector();
+
+        foreach (var field in _fields)
         {
             field.FieldClicked += SetCrossInField;
         }
@@ -29,11 +33,12 @@ public class GameCalculator : MonoBehaviour
     private void SetCrossInField(int numberField)
     {
         _fieldValues[numberField] = FieldValue.Cross;
-        
-        _crossesVictoryDetector.СheckVictoryCrosses();
-        
-        _countManager.AddOneCounter();
-        
-        MovePlayer?.Invoke();
+
+        GameStates =
+            _victoryDetector.CheckVictoryPlayers(_fieldValues, _textOutput, FieldValue.Cross, GameState.CrossesWin);
+
+        _moveCounter.IncreaseCount();
+
+        PlayerMoved?.Invoke();
     }
 }
