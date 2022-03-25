@@ -1,24 +1,20 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class RandomNumbers
 {
-    public int RandomAngularNumber()
+    private const int NumberOfLowerLeftField = 0;
+    private const int NumberOfLowerRightField = 2;
+    private const int NumberOfUpperLeftField = 6;
+    private const int NumberOfUpperRightField = 8;
+
+    private readonly List<int> _numbersOfCornerFields = new List<int>()
+        {NumberOfLowerLeftField, NumberOfLowerRightField, NumberOfUpperLeftField, NumberOfUpperRightField};
+
+    public int RandomCornerNumber()
     {
-        var angularNumber = Random.Range(0, 4);
+        var cornerFieldNumber = _numbersOfCornerFields[Random.Range(0, _numbersOfCornerFields.Count)];
 
-        switch (angularNumber)
-        {
-            case 1:
-                angularNumber += 1;
-                break;
-            case 2:
-                angularNumber *= 3;
-                break;
-            case 3:
-                angularNumber = angularNumber * 3 - 1;
-                break;
-        }
-
-        return angularNumber;
+        return cornerFieldNumber;
     }
 }

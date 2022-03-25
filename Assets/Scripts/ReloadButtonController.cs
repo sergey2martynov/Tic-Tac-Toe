@@ -5,23 +5,23 @@ using UnityEngine.UI;
 public class ReloadButtonController : MonoBehaviour
 {
     [SerializeField] private Button _button;
-    
+
     [SerializeField] private GameObject _buttonGameObject;
 
-    [SerializeField] private TextManager _textManager;
+    [SerializeField] private TextOutput _textOutput;
 
     private void Start()
     {
         _button.onClick.AddListener(OnButtonClicked);
-        
+
         _buttonGameObject.SetActive(false);
 
-        _textManager.GameOver += ShowReloadButton;
+        _textOutput.TextWasShown += ShowReloadButton;
     }
 
     private void OnButtonClicked()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        SceneManager.LoadScene("scene1");
     }
 
     private void ShowReloadButton()

@@ -1,7 +1,7 @@
-public enum GameStates
+public enum GameState
 {
     CrossesWin,
-    ZerosWin,
+    ZeroesWin,
     Draw,
     Game
 }
